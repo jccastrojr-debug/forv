@@ -20,6 +20,17 @@ let isGenerating = false;
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API endpoint — feed cards
+// Feedback endpoint
+app.use(express.json());
+app.post('/api/feedback', (req, res) => {
+  const { name, email, message } = req.body;
+  console.log('--- FEEDBACK RECEIVED ---');
+  console.log(`From: ${name} <${email}>`);
+  console.log(`Message: ${message}`);
+  console.log('-------------------------');
+  res.json({ success: true });
+});
+
 app.get('/api/cards', (req, res) => {
   res.json({
     cards: latestCards,
