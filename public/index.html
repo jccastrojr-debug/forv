@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORV. — Research Synthesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.15);
+    --text: #e8e8f0;
+    --text-dim: #7a7a9a;
+    --text-dimmer: #44445a;
+    --accent: #00e5a0;
+    --accent-dim: rgba(0,229,160,0.12);
+    --red: #ff4d6d;
+    --blue: #4d9fff;
+    --amber: #ffb830;
+    --purple: #a78bfa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    z-index: 100;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    z-index: 90;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-logo-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .nav-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .nav-status {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--text-dimmer);
+  }
+
+  .nav-status.generating {
+    border-color: rgba(0,229,160,0.3);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .refresh-btn {
+    padding: 5px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .refresh-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr 260px;
+    min-height: 100vh;
+    padding-top: 56px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sidebar-left {
+    border-right: 1px solid var(--border);
+    padding: 24px 18px;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+
+  .sidebar-section { margin-bottom: 28px; }
+
+  .sidebar-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-dimmer);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .domain-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+
+  .domain-item:hover { background: var(--surface2); }
+
+  .domain-item.active {
+    background: var(--accent-dim);
+    border-color: rgba(0,229,160,0.2);
+  }
+
+  .domain-name { font-size: 11px; color: var(--text); letter-spacing: 0.04em; }
+  .domain-item.active .domain-name { color: var(--accent); }
+
+  .domain-count {
+    font-size: 9px;
+    color: var(--text-dimmer);
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    color: var(--text-dimmer);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .feed {
+    padding: 24px 28px;
+    max-width: 740px;
+  }
+
+  .feed-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .feed-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .feed-meta {
+    font-size: 9px;
+    color: var(--text-dimmer);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .live-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(0,229,160,0.05);
+    border: 1px solid rgba(0,229,160,0.1);
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+
+  .live-dot {
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .live-text {
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* GENERATING STATE */
+  .generating-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+  }
+
+  .generating-state.visible { display: flex; }
+
+  .generating-ring {
+    width: 48px; height: 48px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .generating-text {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .generating-sub {
+    font-size: 10px;
+    color: var(--text-dimmer);
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+  }
+
+  /* SKELETON CARDS */
+  .skeleton-feed { display: none; }
+  .skeleton-feed.visible { display: block; }
+
+  .skeleton-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .skeleton-line {
+    background: linear-gradient(90deg, var(--surface2) 25%, rgba(255,255,255,0.03) 50%, var(--surface2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+
+  .card.expanded { border-color: rgba(0,229,160,0.25); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-top {
+    padding: 20px 24px 16px;
+    cursor: pointer;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  .tag-domain { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); }
+  .tag-impact { background: rgba(255,77,109,0.1); color: var(--red); border: 1px solid rgba(255,77,109,0.2); }
+  .tag-underexposed { background: rgba(255,184,48,0.1); color: var(--amber); border: 1px solid rgba(255,184,48,0.2); }
+  .tag-crossdomain { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+  .tag-new { background: rgba(77,159,255,0.1); color: var(--blue); border: 1px solid rgba(77,159,255,0.2); }
+
+  .card-timestamp {
+    margin-left: auto;
+    font-size: 9px;
+    color: var(--text-dimmer);
+    letter-spacing: 0.1em;
+  }
+
+  .card-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 19px;
+    line-height: 1.35;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .card-hook {
+    font-size: 12px;
+    line-height: 1.75;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  .depth-selector {
+    display: flex;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .depth-btn {
+    flex: 1;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-dimmer);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .depth-btn:last-child { border-right: none; }
+  .depth-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .depth-btn.active { color: var(--accent); background: var(--accent-dim); }
+
+  .card-body {
+    display: none;
+    padding: 0 24px 20px;
+    animation: expandIn 0.3s ease;
+  }
+
+  .card-body.visible { display: block; }
+
+  @keyframes expandIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .depth-panel { display: none; }
+  .depth-panel.visible { display: block; }
+
+  .lay-content {
+    font-size: 13px;
+    line-height: 1.85;
+    color: var(--text-dim);
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .lay-content strong { color: var(--text); font-weight: 500; }
+
+  .analogy-box {
+    background: rgba(255,184,48,0.06);
+    border: 1px solid rgba(255,184,48,0.15);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    font-size: 12px;
+    color: var(--amber);
+    line-height: 1.75;
+  }
+
+  .analogy-box::before {
+    content: '// ANALOGY';
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    opacity: 0.6;
+    margin-bottom: 6px;
+  }
+
+  .researcher-content {
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .research-block { margin-bottom: 16px; }
+
+  .research-block-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .research-block-text {
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-dim);
+  }
+
+  .research-block-text strong { color: var(--text); font-weight: 500; }
+
+  .implication-list { list-style: none; margin-top: 8px; }
+
+  .implication-list li {
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.65;
+  }
+
+  .implication-list li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .synthesis-note {
+    background: rgba(167,139,250,0.06);
+    border: 1px solid rgba(167,139,250,0.15);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 12px 0 0;
+    font-size: 11px;
+    color: var(--purple);
+    line-height: 1.7;
+  }
+
+  .synthesis-note::before {
+    content: '⟳ FORV SYNTHESIS';
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    opacity: 0.6;
+    margin-bottom: 5px;
+  }
+
+  .source-content {
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .source-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .source-item:last-child { border-bottom: none; }
+
+  .source-number { font-size: 10px; color: var(--accent); width: 20px; flex-shrink: 0; padding-top: 2px; }
+  .source-info { flex: 1; }
+
+  .source-title { font-size: 11px; color: var(--text); margin-bottom: 3px; line-height: 1.4; }
+  .source-journal { font-size: 10px; color: var(--text-dimmer); font-style: italic; margin-bottom: 4px; }
+
+  .source-link {
+    font-size: 9px;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .source-link:hover { opacity: 1; }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 24px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.15);
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dimmer);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .action-btn:hover { color: var(--text); border-color: var(--border-bright); }
+  .action-btn.ml { margin-left: auto; }
+
+  /* RIGHT SIDEBAR */
+  .sidebar-right {
+    border-left: 1px solid var(--border);
+    padding: 24px 18px;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+
+  .synthesis-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .synthesis-item:hover { opacity: 0.7; }
+  .synthesis-item:last-child { border-bottom: none; }
+
+  .synthesis-item-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 5px;
+  }
+
+  .synthesis-item-label.gap { color: var(--amber); }
+
+  .synthesis-item-text {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+
+  .synthesis-item-text strong { color: var(--text); font-weight: 500; }
+
+  .underexposed-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    transition: color 0.2s;
+  }
+
+  .underexposed-item:hover { color: var(--text); }
+  .underexposed-item:last-child { border-bottom: none; }
+
+  .underexposed-highlight { color: var(--accent); }
+
+  /* ERROR STATE */
+  .error-state {
+    display: none;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .error-state.visible { display: block; }
+  .error-text { font-size: 12px; color: var(--red); margin-bottom: 8px; }
+  .error-sub { font-size: 10px; color: var(--text-dimmer); }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar-left, .sidebar-right { display: none; }
+    .feed { padding: 16px; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    FORV.
+  </div>
+  <div class="nav-right">
+    <span class="nav-tag">Research Synthesis Engine</span>
+    <span class="nav-status" id="nav-status">Loading</span>
+    <button class="refresh-btn" onclick="triggerRefresh()">↺ Refresh</button>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Active Domains</div>
+      <div class="domain-item active"><span class="domain-name">Oncology</span><span class="domain-count" id="count-oncology">—</span></div>
+      <div class="domain-item"><span class="domain-name">Genomics</span><span class="domain-count">—</span></div>
+      <div class="domain-item"><span class="domain-name">Immunology</span><span class="domain-count">—</span></div>
+      <div class="domain-item"><span class="domain-name">Structural Biology</span><span class="domain-count">—</span></div>
+      <div class="domain-item"><span class="domain-name">Epigenetics</span><span class="domain-count">—</span></div>
+      <div class="domain-item"><span class="domain-name">Metabolic Biology</span><span class="domain-count">—</span></div>
+      <div class="domain-item"><span class="domain-name">Virology</span><span class="domain-count">—</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Today's Synthesis</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-value" id="stat-papers">—</div>
+          <div class="stat-label">Papers scanned</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="stat-links">—</div>
+          <div class="stat-label">Cross-domain links</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="stat-cards">—</div>
+          <div class="stat-label">Findings</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="stat-updated">—</div>
+          <div class="stat-label">Last updated</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Sources</div>
+      <div style="font-size:10px; color: var(--text-dimmer); line-height:2.2;">
+        PubMed Central<br>
+        ArXiv q-bio<br>
+        bioRxiv<br>
+        Semantic Scholar<br>
+        PLOS ONE
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN FEED -->
+  <main class="feed">
+    <div class="feed-header">
+      <span class="feed-title" id="feed-title">Initialising synthesis pipeline...</span>
+      <span class="feed-meta" id="feed-updated">—</span>
+    </div>
+
+    <div class="live-bar" id="live-bar" style="display:none;">
+      <div class="live-dot"></div>
+      <span class="live-text" id="live-text">Synthesis active</span>
+    </div>
+
+    <!-- Generating state -->
+    <div class="generating-state" id="generating-state">
+      <div class="generating-ring"></div>
+      <div class="generating-text">Synthesising across research domains</div>
+      <div class="generating-sub">Reading papers, finding connections, building cards...</div>
+    </div>
+
+    <!-- Skeleton loader -->
+    <div class="skeleton-feed" id="skeleton-feed">
+      <div class="skeleton-card">
+        <div class="skeleton-line" style="height:10px; width:30%; margin-bottom:16px;"></div>
+        <div class="skeleton-line" style="height:18px; width:90%;"></div>
+        <div class="skeleton-line" style="height:18px; width:75%;"></div>
+        <div class="skeleton-line" style="height:12px; width:85%; margin-top:12px;"></div>
+        <div class="skeleton-line" style="height:12px; width:70%;"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-line" style="height:10px; width:25%; margin-bottom:16px;"></div>
+        <div class="skeleton-line" style="height:18px; width:85%;"></div>
+        <div class="skeleton-line" style="height:18px; width:60%;"></div>
+        <div class="skeleton-line" style="height:12px; width:80%; margin-top:12px;"></div>
+        <div class="skeleton-line" style="height:12px; width:65%;"></div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div class="error-state" id="error-state">
+      <div class="error-text">Pipeline connection failed</div>
+      <div class="error-sub">Make sure the server is running on localhost:3000</div>
+    </div>
+
+    <!-- Cards feed -->
+    <div id="cards-feed"></div>
+
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Live Cross-Domain Synthesis</div>
+      <div class="live-bar" style="margin-bottom:12px;">
+        <div class="live-dot"></div>
+        <span class="live-text" id="links-count-text">Scanning for connections</span>
+      </div>
+      <div id="links-feed"></div>
+    </div>
+
+    <div class="sidebar-section" style="margin-top:20px;">
+      <div class="sidebar-label">Underexposed This Week</div>
+      <div id="underexposed-feed" style="padding-top:6px; font-size:11px; color:var(--text-dim);">
+        Scanning publications...
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+  let currentCards = [];
+  let pollInterval = null;
+
+  // TAG COLOUR MAPPING
+  function tagClass(tag) {
+    const map = {
+      'High Impact': 'tag-impact',
+      'Underexposed': 'tag-underexposed',
+      'Cross-domain': 'tag-crossdomain',
+      'New': 'tag-new'
+    };
+    return map[tag] || 'tag-domain';
+  }
+
+  // RENDER ACCESSIBLE CONTENT
+  function renderAccessible(text) {
+    if (!text) return '<p style="color:var(--text-dim); font-size:12px;">Content loading...</p>';
+    // Replace [ANALOGY] markers with styled box
+    const parts = text.split(/\[ANALOGY\]([\s\S]*?)\[\/ANALOGY\]/);
+    if (parts.length > 1) {
+      return `<div class="lay-content">${parts[0]}<div class="analogy-box">${parts[1]}</div>${parts[2] || ''}</div>`;
+    }
+    // If no analogy markers, just wrap
+    return `<div class="lay-content">${text}</div>`;
+  }
+
+  // RENDER RESEARCHER CONTENT
+  function renderResearcher(data) {
+    if (!data || typeof data !== 'object') {
+      return `<div class="researcher-content"><div class="research-block-text" style="padding-top:16px; border-top:1px solid var(--border);">${data || 'Content loading...'}</div></div>`;
+    }
+
+    const sections = ['Core Finding', 'Cross-Domain Implications', 'Open Questions', 'FORV Synthesis'];
+    let html = '<div class="researcher-content">';
+
+    sections.forEach(section => {
+      const content = data[section];
+      if (!content) return;
+      html += `<div class="research-block"><div class="research-block-label">${section}</div>`;
+
+      if (Array.isArray(content)) {
+        html += '<ul class="implication-list">';
+        content.forEach(item => { html += `<li>${item}</li>`; });
+        html += '</ul>';
+      } else if (section === 'FORV Synthesis') {
+        html += `<div class="synthesis-note" style="margin-top:0;">${content}</div>`;
+      } else {
+        html += `<div class="research-block-text">${content}</div>`;
+      }
+
+      html += '</div>';
+    });
+
+    html += '</div>';
+    return html;
+  }
+
+  // RENDER SOURCES
+  function renderSources(sources) {
+    if (!sources || !sources.length) return '<div style="padding:16px 0; border-top:1px solid var(--border); font-size:11px; color:var(--text-dimmer);">Sources loading...</div>';
+    let html = '<div class="source-content">';
+    sources.forEach((s, i) => {
+      html += `
+        <div class="source-item">
+          <div class="source-number">0${i + 1}</div>
+          <div class="source-info">
+            <div class="source-title">${s.title || 'Untitled'}</div>
+            <div class="source-journal">${s.journal || ''} ${s.date ? '— ' + s.date : ''}</div>
+            ${s.url ? `<a href="${s.url}" target="_blank" class="source-link">View Source →</a>` : ''}
+          </div>
+        </div>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // BUILD CARD HTML
+  function buildCard(card, index) {
+    const cardId = `card-${index}`;
+    const tags = (card.tags || [card.domain, card.impact]).filter(Boolean);
+
+    const tagHTML = tags.map(t =>
+      `<span class="tag ${tagClass(t)}">${t}</span>`
+    ).join('');
+
+    return `
+      <div class="card" id="${cardId}" style="animation-delay:${index * 0.08}s">
+        <div class="card-top" onclick="toggleCard('${cardId}')">
+          <div class="card-meta">
+            ${tagHTML}
+            <span class="card-timestamp">${card.timestamp || 'Recent'}</span>
+          </div>
+          <div class="card-headline">${card.headline || 'Loading...'}</div>
+          <div class="card-hook">${card.hook || ''}</div>
+        </div>
+
+        <div class="depth-selector">
+          <button class="depth-btn" onclick="setDepth('${cardId}', 'lay', event)">Accessible</button>
+          <button class="depth-btn active" onclick="setDepth('${cardId}', 'researcher', event)">Researcher</button>
+          <button class="depth-btn" onclick="setDepth('${cardId}', 'source', event)">Sources</button>
+        </div>
+
+        <div class="card-body" id="${cardId}-body">
+          <div class="depth-panel" id="${cardId}-lay">
+            ${renderAccessible(card.accessible)}
+          </div>
+          <div class="depth-panel visible" id="${cardId}-researcher">
+            ${renderResearcher(card.researcher)}
+          </div>
+          <div class="depth-panel" id="${cardId}-source">
+            ${renderSources(card.sources)}
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="action-btn">⊕ Save</button>
+          <button class="action-btn">↗ Share</button>
+          <button class="action-btn ml">⊞ Related →</button>
+        </div>
+      </div>`;
+  }
+
+  // TOGGLE CARD OPEN/CLOSE
+  function toggleCard(cardId) {
+    const card = document.getElementById(cardId);
+    const body = document.getElementById(cardId + '-body');
+    card.classList.toggle('expanded');
+    body.classList.toggle('visible');
+  }
+
+  // SWITCH DEPTH LAYER
+  function setDepth(cardId, depth, event) {
+    event.stopPropagation();
+    const card = document.getElementById(cardId);
+    const body = document.getElementById(cardId + '-body');
+
+    if (!body.classList.contains('visible')) {
+      body.classList.add('visible');
+      card.classList.add('expanded');
+    }
+
+    const btns = event.target.parentElement.querySelectorAll('.depth-btn');
+    btns.forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const panels = body.querySelectorAll('.depth-panel');
+    panels.forEach(p => p.classList.remove('visible'));
+
+    const target = document.getElementById(`${cardId}-${depth}`);
+    if (target) target.classList.add('visible');
+  }
+
+  // RENDER CROSS-DOMAIN LINKS
+  function renderLinks(links) {
+    const feed = document.getElementById('links-feed');
+    if (!links || !links.length) {
+      feed.innerHTML = '<div style="font-size:11px; color:var(--text-dimmer); padding-top:8px;">Generating connections...</div>';
+      document.getElementById('links-count-text').textContent = 'Scanning for connections';
+      return;
+    }
+
+    document.getElementById('links-count-text').textContent = `${links.length} active connections found`;
+
+    feed.innerHTML = links.map(link => `
+      <div class="synthesis-item">
+        <div class="synthesis-item-label ${link.label === 'Research Gap' ? 'gap' : ''}">⟳ ${link.label || 'Emerging Link'}</div>
+        <div class="synthesis-item-text">${link.text}</div>
+      </div>
+    `).join('');
+  }
+
+  // FORMAT TIME AGO
+  function timeAgo(isoString) {
+    if (!isoString) return '—';
+    const diff = Date.now() - new Date(isoString).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
+  }
+
+  // MAIN RENDER
+  function renderData(data) {
+    const { cards, links, lastUpdated, isGenerating, paperCount } = data;
+
+    // Nav status
+    const statusEl = document.getElementById('nav-status');
+    statusEl.textContent = isGenerating ? 'Generating' : 'Live';
+    statusEl.className = 'nav-status' + (isGenerating ? ' generating' : '');
+
+    // Feed header
+    document.getElementById('feed-title').textContent =
+      isGenerating ? 'Synthesising across research domains...' :
+      cards && cards.length ? `Today's synthesis — ${cards.length} findings across oncology & biology` :
+      'Awaiting first synthesis run...';
+
+    document.getElementById('feed-updated').textContent =
+      lastUpdated ? `Updated ${timeAgo(lastUpdated)}` : '—';
+
+    // Stats
+    document.getElementById('stat-papers').textContent = paperCount || '—';
+    document.getElementById('stat-links').textContent = links ? links.length : '—';
+    document.getElementById('stat-cards').textContent = cards ? cards.length : '—';
+    document.getElementById('stat-updated').textContent = lastUpdated ? timeAgo(lastUpdated) : '—';
+
+    // Live bar
+    const liveBar = document.getElementById('live-bar');
+    if (isGenerating) {
+      liveBar.style.display = 'flex';
+      document.getElementById('live-text').textContent = 'Synthesis pipeline running...';
+    } else if (cards && cards.length) {
+      liveBar.style.display = 'flex';
+      document.getElementById('live-text').textContent = `${paperCount || '?'} papers scanned — synthesis complete`;
+    } else {
+      liveBar.style.display = 'none';
+    }
+
+    // States
+    document.getElementById('generating-state').className = 'generating-state' + (isGenerating && (!cards || !cards.length) ? ' visible' : '');
+    document.getElementById('skeleton-feed').className = 'skeleton-feed' + (isGenerating && (!cards || !cards.length) ? ' visible' : '');
+    document.getElementById('error-state').className = 'error-state';
+
+    // Cards
+    if (cards && cards.length) {
+      document.getElementById('cards-feed').innerHTML = cards.map((c, i) => buildCard(c, i)).join('');
+      currentCards = cards;
+    }
+
+    // Cross-domain links
+    renderLinks(links);
+
+    // Underexposed placeholder
+    if (!isGenerating) {
+      document.getElementById('underexposed-feed').innerHTML = `
+        <div class="underexposed-item">Synthesising underexposed findings from this week's publications... <span class="underexposed-highlight">check back shortly</span></div>
+      `;
+    }
+  }
+
+  // FETCH FROM SERVER
+  async function fetchData() {
+    try {
+      const res = await fetch('/api/cards');
+      if (!res.ok) throw new Error('Server error');
+      const data = await res.json();
+      renderData(data);
+
+      // If generating, poll every 8 seconds
+      if (data.isGenerating) {
+        if (!pollInterval) {
+          pollInterval = setInterval(fetchData, 8000);
+        }
+      } else {
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
+      }
+    } catch (err) {
+      console.error('Fetch error:', err);
+      document.getElementById('generating-state').className = 'generating-state';
+      document.getElementById('skeleton-feed').className = 'skeleton-feed';
+      document.getElementById('error-state').className = 'error-state visible';
+      document.getElementById('nav-status').textContent = 'Offline';
+    }
+  }
+
+  // MANUAL REFRESH
+  async function triggerRefresh() {
+    try {
+      await fetch('/api/refresh');
+      setTimeout(fetchData, 1000);
+      if (!pollInterval) {
+        pollInterval = setInterval(fetchData, 8000);
+      }
+    } catch (err) {
+      console.error('Refresh error:', err);
+    }
+  }
+
+  // DOMAIN FILTER CLICKS
+  document.querySelectorAll('.domain-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.domain-item').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // INIT
+  fetchData();
+</script>
+
+</body>
+</html>
