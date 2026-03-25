@@ -698,6 +698,7 @@
     <span class="nav-tag">Research Synthesis Engine</span>
     <span class="nav-status" id="nav-status">Loading</span>
     <button class="refresh-btn" onclick="triggerRefresh()">↺ Refresh</button>
+          <button class="refresh-btn" onclick="openFeedback()" style="border-color: rgba(167,139,250,0.3); color: var(--purple);">✉ Talk to Us</button>
   </div>
 </nav>
 
@@ -1112,6 +1113,55 @@
 
   // INIT
   fetchData();
+</script>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedback-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; align-items:center; justify-content:center;">
+  <div style="background:var(--surface); border:1px solid var(--border-bright); border-radius:16px; padding:32px; width:100%; max-width:480px; margin:20px;">
+    <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:16px; letter-spacing:0.1em; color:var(--accent); margin-bottom:6px;">FORV.</div>
+    <div style="font-family:'Instrument Serif',serif; font-size:18px; color:var(--text); margin-bottom:20px; font-style:italic;">Report a problem or get in touch</div>
+    <input id="fb-name" placeholder="Your name" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:10px 14px; color:var(--text); font-family:'DM Mono',monospace; font-size:11px; margin-bottom:10px; outline:none;">
+    <input id="fb-email" placeholder="Your email" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:10px 14px; color:var(--text); font-family:'DM Mono',monospace; font-size:11px; margin-bottom:10px; outline:none;">
+    <textarea id="fb-message" placeholder="Your message..." rows="4" style="width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:10px 14px; color:var(--text); font-family:'DM Mono',monospace; font-size:11px; margin-bottom:16px; outline:none; resize:vertical;"></textarea>
+    <div style="display:flex; gap:10px;">
+      <button onclick="submitFeedback()" style="flex:1; padding:10px; background:var(--accent-dim); border:1px solid rgba(0,229,160,0.3); border-radius:6px; color:var(--accent); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer;">Send Message</button>
+      <button onclick="closeFeedback()" style="padding:10px 16px; background:transparent; border:1px solid var(--border); border-radius:6px; color:var(--text-dimmer); font-family:'DM Mono',monospace; font-size:10px; cursor:pointer;">Cancel</button>
+    </div>
+    <div id="fb-success" style="display:none; margin-top:12px; font-size:11px; color:var(--accent); text-align:center; letter-spacing:0.1em;">Message received — thank you.</div>
+  </div>
+</div>
+
+<script>
+  function openFeedback() {
+    const modal = document.getElementById('feedback-modal');
+    modal.style.display = 'flex';
+  }
+
+  function closeFeedback() {
+    document.getElementById('feedback-modal').style.display = 'none';
+    document.getElementById('fb-success').style.display = 'none';
+    document.getElementById('fb-name').value = '';
+    document.getElementById('fb-email').value = '';
+    document.getElementById('fb-message').value = '';
+  }
+
+  async function submitFeedback() {
+    const name = document.getElementById('fb-name').value;
+    const email = document.getElementById('fb-email').value;
+    const message = document.getElementById('fb-message').value;
+    if (!name || !email || !message) return;
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+      document.getElementById('fb-success').style.display = 'block';
+      setTimeout(closeFeedback, 2000);
+    } catch (err) {
+      console.error('Feedback error:', err);
+    }
+  }
 </script>
 
 </body>
