@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 
 const PUBMED_KEY = process.env.PUBMED_API_KEY;
 

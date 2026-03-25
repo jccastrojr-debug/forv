@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
 

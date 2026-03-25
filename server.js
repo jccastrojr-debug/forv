@@ -8,7 +8,7 @@ const { fetchAllPapers } = require('./fetcher');
 const { synthesizePapers, generateCrossDomainLinks } = require('./synthesizer');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Store latest synthesis in memory
 let latestCards = [];
