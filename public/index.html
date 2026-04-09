@@ -698,7 +698,6 @@
     <span class="nav-tag">Research Synthesis Engine</span>
     <span class="nav-status" id="nav-status">Loading</span>
     <button class="refresh-btn" onclick="triggerRefresh()">↺ Refresh</button>
-          <button class="refresh-btn" onclick="openAbout()" style="border-color: var(--border); color: var(--text-dim);">About</button>
           <button class="refresh-btn" onclick="openFeedback()" style="border-color: rgba(167,139,250,0.3); color: var(--purple);">✉ Talk to Us</button>
   </div>
 </nav>
@@ -1164,6 +1163,7 @@
     }
   }
 </script>
+
 <!-- ABOUT MODAL -->
 <div id="about-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:200; align-items:center; justify-content:center;">
   <div style="background:var(--surface); border:1px solid var(--border-bright); border-radius:16px; padding:40px; width:100%; max-width:560px; margin:20px;">
@@ -1186,5 +1186,6 @@
     document.getElementById('about-modal').style.display = 'none';
   }
 </script>
+
 </body>
 </html>
