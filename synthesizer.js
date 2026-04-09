@@ -7,8 +7,8 @@ async function synthesizePapers(papers) {
   console.log('Running synthesis across papers...');
 
   const paperList = papers.slice(0, 20).map((p, i) =>
-    `${i + 1}. "${p.title}" — ${p.journal} (${p.date})`
-  ).join('\n');
+    `${i + 1}. "${p.title}" — ${p.journal} (${p.date})${p.abstract ? '\nAbstract: ' + p.abstract.slice(0, 300) : ''}`
+  ).join('\n\n');
 
   const prompt = `You are FORV, a research synthesis engine. You have scanned the following recently published papers across oncology, structural biology, immunology, metabolic biology and epigenetics:
 

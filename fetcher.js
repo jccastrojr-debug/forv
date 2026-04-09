@@ -27,7 +27,7 @@ async function searchPubMed(term, maxResults = 5) {
   const summaryRes = await fetch(summaryUrl);
   const summaryData = await summaryRes.json();
 
-  return ids.map(id => {
+return ids.map(id => {
     const paper = summaryData.result[id];
     return {
       id,
@@ -36,6 +36,7 @@ async function searchPubMed(term, maxResults = 5) {
       date: paper.pubdate,
       authors: paper.authors?.slice(0, 3).map(a => a.name).join(', '),
       url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`,
+      abstract: paper.abstract || '',
       source: 'PubMed'
     };
   });
