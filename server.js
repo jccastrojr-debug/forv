@@ -116,7 +116,7 @@ cron.schedule('0 6 * * *', () => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`FORV running at http://localhost:${PORT}`);
+  console.log(`FORV running at http://0.0.0.0:${PORT}`);
   loadCache();
 
   // Run pipeline immediately on first start if no cache
