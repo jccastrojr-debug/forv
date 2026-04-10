@@ -26,7 +26,7 @@ Your job is to identify the 3 most significant findings and synthesize them into
 - impact: Either "High Impact" or "Underexposed"
 - timestamp: How many hours ago published, as a string like "3h ago"
 
-Return ONLY a valid JSON array of 3 card objects. No preamble. No explanation. No markdown. Raw JSON only.`;
+Return ONLY a valid JSON array of 10 card objects. No preamble. No explanation. No markdown. Raw JSON only.`;
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -37,7 +37,7 @@ Return ONLY a valid JSON array of 3 card objects. No preamble. No explanation. N
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
+      max_tokens: 8000,
       messages: [{ role: 'user', content: prompt }]
     })
   });
@@ -76,7 +76,7 @@ ${summaries}
 
 Identify 3 non-obvious connections between them that no single paper makes. Each connection should be a genuine intellectual insight — where two findings from different domains intersect to suggest something neither paper individually proposes.
 
-Return ONLY a valid JSON array of 3 objects each with:
+Return ONLY a valid JSON array of 5 objects each with:
 - label: Either "Emerging Link" or "Research Gap"  
 - text: Two sentences max. Name the specific findings being connected. Be precise.
 
