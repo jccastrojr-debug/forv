@@ -1097,17 +1097,29 @@
   }
 
   // MANUAL REFRESH
-  async function triggerRefresh() {
-    try {
-      await fetch('/api/refresh');
-      setTimeout(fetchData, 1000);
-      if (!pollInterval) {
-        pollInterval = setInterval(fetchData, 8000);
-      }
-    } catch (err) {
-      console.error('Refresh error:', err);
+ async function triggerRefresh() {
+    const btn = document.querySelector('.refresh-btn[onclick="triggerRefresh()"]');
+    if (btn) {
+        btn.textContent = '⟳ Synthesising...';
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
     }
-  }
+    try {
+        await fetch('/api/refresh');
+        setTimeout(fetchData, 1000);
+        if (!pollInterval) {
+            pollInterval = setInterval(fetchData, 8000);
+        }
+    } catch (err) {
+        console.error('Refresh error:', err);
+    } finally {
+        if (btn) {
+            btn.textContent = '⟳ Refresh';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+    }
+}
 
   // DOMAIN FILTER CLICKS
   document.querySelectorAll('.domain-item').forEach(item => {
