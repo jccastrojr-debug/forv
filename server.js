@@ -115,7 +115,7 @@ cron.schedule('0 6 * * *', () => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`FORV running at http://localhost:${PORT}`);
   loadCache();
 
