@@ -46,6 +46,34 @@ app.get('/api/cards', (req, res) => {
 });
 
 // API endpoint — trigger manual refresh
+// Privacy policy page
+app.get('/privacy', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — FORV.</title>
+  <style>
+    body { background:#0a0a0a; color:#ccc; font-family:monospace; font-size:13px; line-height:1.9; max-width:600px; margin:60px auto; padding:0 24px; }
+    h1 { font-family:'Syne',sans-serif; color:#00ff88; font-size:18px; letter-spacing:0.1em; margin-bottom:40px; }
+    h2 { font-size:13px; color:#fff; margin-top:32px; letter-spacing:0.05em; }
+    a { color:#00ff88; text-decoration:none; }
+    .back { display:inline-block; margin-bottom:40px; font-size:11px; letter-spacing:0.1em; border-bottom:1px solid #00ff88; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← FORV.</a>
+  <h1>PRIVACY POLICY</h1>
+  <p>FORV. does not collect, store, or share personal data.</p>
+  <p>The feedback form accepts optional messages to help improve the platform. These messages are not linked to any identifying information and are reviewed only by the FORV. team.</p>
+  <p>No cookies are used. No tracking scripts are loaded. No analytics are collected.</p>
+  <p>FORV. is a free tool built to surface scientific research. It has no commercial interest in your data.</p>
+  <p>If you have questions, contact us through the feedback form.</p>
+  <p style="margin-top:48px; opacity:0.5;">Last updated: April 2026</p>
+</body>
+</html>`);
+});
 app.get('/api/refresh', async (req, res) => {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const now = Date.now();
