@@ -8,6 +8,10 @@ const { fetchAllPapers } = require('./fetcher');
 const { synthesizePapers, generateCrossDomainLinks } = require('./synthesizer');
 
 const app = express();
+// Rate limiting
+const refreshLimiter = new Map();
+const REFRESH_LIMIT = 3;
+const REFRESH_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
 const PORT = process.env.PORT || 8080;
 
 // Store latest synthesis in memory
@@ -43,6 +47,22 @@ app.get('/api/cards', (req, res) => {
 
 // API endpoint — trigger manual refresh
 app.get('/api/refresh', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const now = Date.now();
+  const record = refreshLimiter.get(ip) || { count: 0, start: now };
+
+  if (now - record.start > REFRESH_WINDOW) {
+    record.count = 0;
+    record.start = now;
+  }
+
+  if (record.count >= REFRESH_LIMIT) {
+    return res.status(429).json({ status: 'rate limited', message: 'Maximum 3 refreshes per hour.' });
+  }
+
+  record.count++;
+  refreshLimiter.set(ip, record);
+
   if (isGenerating) {
     return res.json({ status: 'already running' });
   }
