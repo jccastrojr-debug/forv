@@ -1097,7 +1097,7 @@
   }
 
   // MANUAL REFRESH
- async function triggerRefresh() {
+async function triggerRefresh() {
     const btn = document.querySelector('.refresh-btn[onclick="triggerRefresh()"]');
     if (btn) {
         btn.textContent = '⟳ Synthesising...';
@@ -1105,7 +1105,14 @@
         btn.style.opacity = '0.6';
     }
     try {
-        await fetch('/api/refresh');
+        const response = await fetch('/api/refresh');
+        const data = await response.json();
+
+        if (response.status === 429) {
+            alert('You have reached the maximum of 3 refreshes per hour. Please check back later.');
+            return;
+        }
+
         setTimeout(fetchData, 1000);
         if (!pollInterval) {
             pollInterval = setInterval(fetchData, 8000);
@@ -1120,7 +1127,6 @@
         }
     }
 }
-
   // DOMAIN FILTER CLICKS
   document.querySelectorAll('.domain-item').forEach(item => {
     item.addEventListener('click', function() {
