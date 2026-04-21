@@ -20,16 +20,12 @@ let latestLinks = [];
 let lastUpdated = null;
 let isGenerating = false;
 
-// Paper-level cache: maps paper title to its synthesized card
-let paperCache = {};
-
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API endpoint: feed cards
-app.use(express.json());
-
+// API endpoint — feed cards
 // Feedback endpoint
+app.use(express.json());
 app.post('/api/feedback', (req, res) => {
   const { name, email, message } = req.body;
   console.log('--- FEEDBACK RECEIVED ---');
@@ -49,6 +45,7 @@ app.get('/api/cards', (req, res) => {
   });
 });
 
+// API endpoint — trigger manual refresh
 // Privacy policy page
 app.get('/privacy', (req, res) => {
   res.send(`<!DOCTYPE html>
@@ -56,7 +53,7 @@ app.get('/privacy', (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy - FORV.</title>
+  <title>Privacy Policy — FORV.</title>
   <style>
     body { background:#0a0a0a; color:#ccc; font-family:monospace; font-size:13px; line-height:1.9; max-width:600px; margin:60px auto; padding:0 24px; }
     h1 { font-family:'Syne',sans-serif; color:#00ff88; font-size:18px; letter-spacing:0.1em; margin-bottom:40px; }
@@ -66,7 +63,7 @@ app.get('/privacy', (req, res) => {
   </style>
 </head>
 <body>
-  <a href="/" class="back">< FORV.</a>
+  <a href="/" class="back">← FORV.</a>
   <h1>PRIVACY POLICY</h1>
   <p>FORV. does not collect, store, or share personal data.</p>
   <p>The feedback form accepts optional messages to help improve the platform. These messages are not linked to any identifying information and are reviewed only by the FORV. team.</p>
@@ -77,8 +74,6 @@ app.get('/privacy', (req, res) => {
 </body>
 </html>`);
 });
-
-// API endpoint: trigger manual refresh
 app.get('/api/refresh', async (req, res) => {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const now = Date.now();
@@ -103,7 +98,7 @@ app.get('/api/refresh', async (req, res) => {
   runPipeline();
 });
 
-// API endpoint: status
+// API endpoint — status
 app.get('/api/status', (req, res) => {
   res.json({
     status: isGenerating ? 'generating' : 'ready',
@@ -112,7 +107,7 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Main pipeline with caching
+// Main pipeline
 async function runPipeline() {
   if (isGenerating) return;
   isGenerating = true;
@@ -122,38 +117,23 @@ async function runPipeline() {
     const papers = await fetchAllPapers();
 
     if (!papers.length) {
-      console.log('No papers fetched. Aborting synthesis');
+      console.log('No papers fetched — aborting synthesis');
       isGenerating = false;
       return;
     }
 
-    // Pass paperCache so synthesizer can skip already-processed papers
-    const cards = await synthesizePapers(papers, paperCache);
+    const cards = await synthesizePapers(papers);
     const links = await generateCrossDomainLinks(cards);
 
     latestCards = cards;
     latestLinks = links;
     lastUpdated = new Date().toISOString();
 
-    // Update paper cache with new cards
-    cards.forEach(card => {
-      const key = card.paperId || card.headline;
-      if (key) paperCache[key] = card;
-    });
-
-    // Clean old entries from cache (keep last 7 days worth, max 200 entries)
-    const cacheKeys = Object.keys(paperCache);
-    if (cacheKeys.length > 200) {
-      const toRemove = cacheKeys.slice(0, cacheKeys.length - 200);
-      toRemove.forEach(k => delete paperCache[k]);
-      console.log(`Trimmed ${toRemove.length} old entries from paper cache`);
-    }
-
     // Save to disk so it survives server restart
-    const cache = { cards, links, lastUpdated, paperCache };
+    const cache = { cards, links, lastUpdated };
     fs.writeFileSync('./cache.json', JSON.stringify(cache, null, 2));
 
-    console.log(`Pipeline complete. ${cards.length} cards, ${links.length} cross-domain links`);
+    console.log(`Pipeline complete — ${cards.length} cards, ${links.length} cross-domain links`);
   } catch (err) {
     console.error('Pipeline error:', err.message);
   }
@@ -169,11 +149,10 @@ function loadCache() {
       latestCards = cache.cards || [];
       latestLinks = cache.links || [];
       lastUpdated = cache.lastUpdated || null;
-      paperCache = cache.paperCache || {};
-      console.log(`Loaded ${latestCards.length} cards and ${Object.keys(paperCache).length} cached papers from disk`);
+      console.log(`Loaded ${latestCards.length} cards from cache`);
     }
   } catch {
-    console.log('No cache found. Will generate on first run');
+    console.log('No cache found — will generate on first run');
   }
 }
 
@@ -190,7 +169,7 @@ app.listen(PORT, '0.0.0.0', () => {
 
   // Run pipeline immediately on first start if no cache
   if (!latestCards.length) {
-    console.log('No cache found. Running initial synthesis now...');
+    console.log('No cache found — running initial synthesis now...');
     runPipeline();
   }
 });
