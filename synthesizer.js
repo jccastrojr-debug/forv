@@ -47,8 +47,8 @@ function parseJSON(raw) {
 
 // Synthesize a small batch of papers (3-5 at a time)
 async function synthesizeBatch(papers) {
-  const paperList = papers.map((p, i) =>
-    `${i + 1}. "${p.title}" | ${p.journal} (${p.date})${p.abstract ? '\nAbstract: ' + p.abstract.slice(0, 300) : ''}`
+  const paperList = papers.slice(0, 20).map((p, i) =>
+    `${i + 1}. "${p.title}" — ${p.journal} (${p.date}) [URL: ${p.url || 'none'}] [SOURCE: ${p.source || 'unknown'}]${p.abstract ? '\nAbstract: ' + p.abstract.slice(0, 300) : ''}`
   ).join('\n\n');
 
   const prompt = `You are FORV, a research synthesis engine. You have scanned the following recently published papers across oncology, structural biology, immunology, metabolic biology and epigenetics:
@@ -62,7 +62,7 @@ Your job is to identify the most significant findings and synthesize them into s
 - tags: Array of 2-3 tags from this list only: ["Oncology", "Genomics", "Immunology", "Structural Biology", "Epigenetics", "Metabolic Biology", "Virology", "High Impact", "Underexposed", "Cross-domain", "New"]
 - accessible: Three paragraphs for a curious non-specialist. Use one analogy clearly marked with [ANALOGY]. No jargon without immediate plain-language explanation.
 - researcher: An object with four keys: "Core Finding" (string, technical detail), "Cross-Domain Implications" (array of 4 strings connecting to other fields), "Open Questions" (array of 2 strings), "FORV Synthesis" (string, what this paper means when read against others).
-- sources: Array of up to 3 objects each with title, journal, date. Do not include a url field at all — urls will be added separately.
+- sources: Array of up to 3 objects each with title, journal, date, url, source — copied exactly from the paper list above. Use the exact URL provided in [URL: ...] and the exact source name from [SOURCE: ...]. If URL is 'none', omit it.
 - domain: Single primary domain from the tag list.
 - impact: Either "High Impact" or "Underexposed"
 - timestamp: How many hours ago published, as a string like "3h ago"
