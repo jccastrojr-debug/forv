@@ -46,8 +46,8 @@ function parseJSON(raw) {
 }
 
 // Synthesize a small batch of papers (3-5 at a time)
-async function synthesizeBatch(papers) {
-  const paperList = papers.slice(0, 20).map((p, i) =>
+async function synthesizeBatch({ papers, paperList }) {
+  paperList = paperList || papers.slice(0, 20).map((p, i) =>
     `${i + 1}. "${p.title}" — ${p.journal} (${p.date}) [URL: ${p.url || 'none'}] [SOURCE: ${p.source || 'unknown'}]${p.abstract ? '\nAbstract: ' + p.abstract.slice(0, 300) : ''}`
   ).join('\n\n');
 
@@ -93,32 +93,12 @@ async function synthesizePapers(papers, existingCache = {}) {
   }
 
   // Process new papers in batches of 5
-  const BATCH_SIZE = 5;
-  const newCards = [];
+  const paperList = newPapers.slice(0, 20).map((p, i) =>
+    `${i + 1}. "${p.title}" — ${p.journal} (${p.date}) [URL: ${p.url || 'none'}] [SOURCE: ${p.source || 'unknown'}]${p.abstract ? '\nAbstract: ' + p.abstract.slice(0, 300) : ''}`
+  ).join('\n\n');
 
-  for (let i = 0; i < newPapers.length; i += BATCH_SIZE) {
-    const batch = newPapers.slice(i, i + BATCH_SIZE);
-    console.log(`Synthesizing batch ${Math.floor(i / BATCH_SIZE) + 1} (${batch.length} papers)...`);
-
-    try {
-      const cards = await synthesizeBatch(batch);
-      newCards.push(...cards);
-      console.log(`Batch produced ${cards.length} cards`);
-
-      // Small delay between batches to be nice to the API
-      if (i + BATCH_SIZE < newPapers.length) {
-        await new Promise(r => setTimeout(r, 1000));
-      }
-    } catch (err) {
-      console.error(`Batch error:`, err.message);
-      // Continue with next batch instead of failing entirely
-    }
-  }
-
-  // Combine cached + new cards, limit to most recent 15
-  const allCards = [...newCards, ...cachedCards].slice(0, 15);
-  console.log(`Total cards after merge: ${allCards.length} (${newCards.length} new + ${cachedCards.length} cached)`);
-
+  const allCards = await synthesizeBatch({ papers: newPapers, paperList });
+  console.log(`Generated ${allCards.length} synthesis cards`);
   return allCards;
 }
 
