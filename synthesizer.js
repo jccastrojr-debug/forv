@@ -55,7 +55,7 @@ async function synthesizeBatch({ papers, paperList }) {
 
 ${paperList}
 
-Your job is to identify the 10 most significant findings and synthesize them into structured feed cards. For each paper that has a genuinely notable finding, produce a JSON object with exactly these fields:
+Your job is to identify the 5 most significant findings and synthesize them into structured feed cards. For each paper that has a genuinely notable finding, produce a JSON object with exactly these fields:
 
 - headline: A single sharp sentence stating what was found. Not a question. Not vague. A finding.
 - hook: Two sentences expanding the finding. Technical enough to be credible, clear enough for an engaged non-specialist.
@@ -70,7 +70,7 @@ Your job is to identify the 10 most significant findings and synthesize them int
 
 Return ONLY a valid JSON array of card objects. No preamble. No explanation. No markdown. Raw JSON only.`;
 
-  const raw = await callClaude(MODEL_DEEP, prompt, 6000);
+  const raw = await callClaude(MODEL_DEEP, prompt, 8000);
   if (!raw) return [];
 
   const cards = parseJSON(raw);
