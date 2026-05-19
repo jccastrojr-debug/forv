@@ -62,7 +62,7 @@ Your job is to identify the 5 most significant findings and synthesize them into
 - tags: Array of 2-3 tags from this list only: ["Oncology", "Genomics", "Immunology", "Structural Biology", "Epigenetics", "Metabolic Biology", "Virology", "High Impact", "Underexposed", "Cross-domain", "New"]
 - accessible: Three paragraphs for a curious non-specialist. Use one analogy clearly marked with [ANALOGY]. No jargon without immediate plain-language explanation.
 - researcher: An object with four keys: "Core Finding" (string, technical detail), "Cross-Domain Implications" (array of 4 strings connecting to other fields), "Open Questions" (array of 2 strings), "FORV Synthesis" (string, what this paper means when read against others).
-- sources: Array of up to 3 objects each with title, journal, date, url, source — copied exactly from the paper list above. Use the exact URL provided in [URL: ...] and the exact source name from [SOURCE: ...]. If URL is 'none', omit it.
+- sources: Array of 2 to 4 objects representing the distinct papers that informed this synthesis card. Each object has title, journal, date — copied exactly from the paper list above. A synthesis card must draw from multiple papers, not just one. Include all papers that contributed to the finding.
 - domain: Single primary domain from the tag list.
 - impact: Either "High Impact" or "Underexposed"
 - timestamp: How many hours ago published, as a string like "3h ago"
