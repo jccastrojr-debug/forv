@@ -890,7 +890,7 @@
           <div class="source-info">
             <div class="source-title">${s.title || 'Untitled'}</div>
             <div class="source-journal">${s.journal || ''} ${s.date ? '— ' + s.date : ''}</div>
-            ${s.url && s.url !== 'none' ? `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="source-link">View Source — ${s.source || 'Open'} →</a>` : `<a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(s.title)}" target="_blank" rel="noopener noreferrer" class="source-link">Search PubMed →</a>`}
+            <div style="font-size:9px; color:var(--text-dimmer); margin-top:4px; letter-spacing:0.05em;">Copy title to search in PubMed, Google Scholar or your institution's database</div>
           </div>
         </div>`;
     });
