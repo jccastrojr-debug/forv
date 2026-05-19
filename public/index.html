@@ -890,7 +890,7 @@
           <div class="source-info">
             <div class="source-title">${s.title || 'Untitled'}</div>
             <div class="source-journal">${s.journal || ''} ${s.date ? '— ' + s.date : ''}</div>
-            ${s.url ? `<a href="${s.url}" target="_blank" class="source-link">View Source →</a>` : ''}
+            ${s.url ? `<a href="${s.url.startsWith('http') ? s.url : 'https://' + s.url}" target="_blank" rel="noopener noreferrer" class="source-link">View Source →</a>` : '<span style="font-size:9px; color:var(--text-dimmer);">No link available</span>'}
           </div>
         </div>`;
     });
