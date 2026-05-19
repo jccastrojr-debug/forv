@@ -62,7 +62,7 @@ Your job is to identify the most significant findings and synthesize them into s
 - tags: Array of 2-3 tags from this list only: ["Oncology", "Genomics", "Immunology", "Structural Biology", "Epigenetics", "Metabolic Biology", "Virology", "High Impact", "Underexposed", "Cross-domain", "New"]
 - accessible: Three paragraphs for a curious non-specialist. Use one analogy clearly marked with [ANALOGY]. No jargon without immediate plain-language explanation.
 - researcher: An object with four keys: "Core Finding" (string, technical detail), "Cross-Domain Implications" (array of 4 strings connecting to other fields), "Open Questions" (array of 2 strings), "FORV Synthesis" (string, what this paper means when read against others).
-- - sources: Array of up to 3 objects each with title, journal, date, url — taken directly from the paper list above. For url, only include a real URL starting with http. If no real URL is available, omit the url field entirely. Never use placeholder text like "not provided" or "N/A" for url.
+- sources: Array of up to 3 objects each with title, journal, date. Do not include a url field at all — urls will be added separately.
 - domain: Single primary domain from the tag list.
 - impact: Either "High Impact" or "Underexposed"
 - timestamp: How many hours ago published, as a string like "3h ago"
